@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sening uchun maxsus ❤️</title>
+    <!-- Salyut / Confetti kutubxonasi -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        /* KIRISH EKRANI (WELCOME OVERLAY) */
+        #welcomeOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 240, 243, 0.98);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .welcome-box {
+            background: #ffffff;
+            padding: 30px 20px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(255, 75, 43, 0.2);
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .welcome-title {
+            color: #ff3366;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* ASOSIY KARTA */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 15px 35px rgba(255, 75, 43, 0.15);
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .card.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .music-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 75, 43, 0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: #ff3366;
+            font-size: 24px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* SLIDER */
+        .slider {
+            width: 100%;
+            height: 220px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .slider img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        /* CHECKLIST (BIRGALIKDA QILADIGAN ISHLAR) */
+        .bucket-section {
+            background: #fff5f6;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff3366;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .bucket-item {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #444;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #ffe6e6;
+        }
+
+        .bucket-item.checked {
+            background: #ffe6e6;
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #ff3366;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+
+        .bucket-item.checked .checkbox {
+            background: #ff3366;
+        }
+
+        /* SAVOLLAR VA TUGMALAR */
+        .step-block {
+            margin-top: 15px;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #ffe6e6;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #ff3366, #ff6b81);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.25);
+        }
+
+        .no-btn {
+            background: #888;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .no-btn-moved {
+            opacity: 0.5;
+            transform: translateY(15px);
+            background: #aaa;
+        }
+
+        .destroy {
+            animation: shatter 0.5s forwards ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes shatter {
+            0% { transform: scale(1) translateY(15px); opacity: 0.5; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 0.3; filter: blur(2px); }
+            100% { transform: scale(0) rotate(-15deg); opacity: 0; filter: blur(8px); height: 0; padding: 0; margin: 0; }
+        }
+
+        /* TA'SIRLI MAKTUB */
+        .letter {
+            display: none;
+            margin-top: 20px;
+            padding: 20px 15px;
+            background: #fff0f3;
+            border-radius: 18px;
+            border: 2px dashed #ff3366;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+            animation: fadeIn 0.8s ease-in-out;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.1);
+        }
+
+        .letter-title {
+            font-weight: bold;
+            color: #ff3366;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .heart {
+            position: fixed;
+            color: #ff4b2b;
+            font-size: 18px;
+            animation: float 4s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1-BOSQICH: KIRISH EKRANI -->
+    <div id="welcomeOverlay">
+        <div class="welcome-box">
+            <div class="welcome-title">Salom yuragim... ❤️<br><br>Saytga kirishdan oldin aytchi, hammasiga tayyormisan?</div>
+            <button class="action-btn" onclick="startExperience()">Ha, albatta tayyorman! ✨</button>
+        </div>
+    </div>
+
+    <!-- ASOSIY SAYT -->
+    <div class="card" id="mainCard">
+        <button class="music-btn" onclick="toggleMusic()" id="mBtn">🎵</button>
+
+        <h1>Yaxshiyamki borsan! ❤️</h1>
+        <p class="subtitle">Sening kulging men uchun eng katta baxt</p>
+
+        <!-- Slayder -->
+        <div class="slider">
+            <img id="slideImg" src="rasm1.jpg" alt="Biz">
+        </div>
+
+        <!-- Birgalikda qiladigan ishlarimiz (Checklist) -->
+        <div class="bucket-section">
+            <div class="section-title">Biz birgalikda qilishimiz shart bo'lgan ishlar: ✨</div>
+            
+            <div class="bucket-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span>Birgalikda muzqaymoq yeb shahar aylanish 🍦</span>
+            </div>
+            <div class="bucket-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span>Tunda uzoq gaplashib o'tirish 🌙</span>
+            </div>
+            <div class="bucket-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span>Arazlashishni abadiy unutish 🤝</span>
+            </div>
+            <div class="bucket-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span>Har doim bir-birimizni qo'llab-quvvatlash ❤️</span>
+            </div>
+            <div class="bucket-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span>Har doim bir-birimizga mehr ko'rsatish 🥰</span>
+            </div>
+        </div>
+
+        <!-- 1-SAVOL BLOCKI -->
+        <div class="step-block" id="step1">
+            <div class="step-title">Eski xatolarni unutib, yangidan boshlaymizmi? 🥺</div>
+            <div class="btn-group">
+                <button class="action-btn" onclick="answerStep1Yes()">Ha, albatta!</button>
+                <button class="no-btn" id="noBtn1" onclick="clickNo1()">Yo'q, kerak emas</button>
+            </div>
+        </div>
+
+        <!-- 2-SAVOL BLOCKI -->
+        <div class="step-block" id="step2" style="display: none;">
+            <div class="step-title">Men bilan birga bo'lish senga baxt beradimi? 🥰</div>
+            <div class="btn-group">
+                <button class="action-btn" onclick="answerStep2Yes()">Ha, juda ham!</button>
+                <button class="no-btn" id="noBtn2" onclick="clickNo2()">Yo'q</button>
+            </div>
+        </div>
+
+        <!-- ENG PASTIDAGI TA'SIRLI MAKTUB -->
+        <div class="letter" id="secretLetter">
+            <div class="letter-title">Mening eng qadrdon insonimga... 🌹</div>
+            <p>
+                Bilasanmi, seni yo'qotib qo'yishdan qanchalik qo'rqqanimni so'z bilan ta'riflab bera olmayman. Oraga ozgina sovuqchilik tushganda ham, butun dunyoyim topshirilgandek bo'ladi.<br><br>
+                Sening kulging, sening mehring va hattoki sening arazlashing ham men uchun juda qadrli. Ba'zan tushunmovchiliklar bo'lib turadi, lekin bu mening yuragimdagi sevgimni aslo kamaytira olmaydi.<br><br>
+                Meni kechirganing va menga yana bir bor imkon berganing uchun rahmat. Senga va'da beraman — har bir kuningni quvonchga to'ldirishga va seni dunyodagi eng baxtli qiz qilishga harakat qilaman. Yaxshiyamki hayotimda borsan! ❤️
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Salyut otish funksiyasi
+        function fireFireworks() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Kirish ekranidagi "Ha" bosilganda
+        function startExperience() {
+            document.getElementById('welcomeOverlay').style.opacity = '0';
+            document.getElementById('welcomeOverlay').style.visibility = 'hidden';
+            document.getElementById('mainCard').classList.add('active');
+            
+            // Salyut otiladi
+            fireFireworks();
+
+            // Musiqa yoqishga harakat qilamiz
+            const audio = document.getElementById('bgMusic');
+            audio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('mBtn').innerHTML = '🔊';
+            }).catch(() => {});
+        }
+
+        // Checklist elementlarini belgilash
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            if (element.classList.contains('checked')) {
+                element.querySelector('.checkbox').innerHTML = '✓';
+                fireFireworks(); // Checklist bosilganda ham kichik salyut
+            } else {
+                element.querySelector('.checkbox').innerHTML = '';
+            }
+        }
+
+        // 1-Yo'q tugmasi bosilishi
+        let no1State = 0;
+        function clickNo1() {
+            const btn = document.getElementById('noBtn1');
+            if (no1State === 0) {
+                btn.classList.add('no-btn-moved');
+                no1State = 1;
+            } else {
+                btn.classList.add('destroy');
+                setTimeout(() => { btn.style.display = 'none'; }, 500);
+            }
+        }
+
+        // 1-Savolga "Ha" javobi
+        function answerStep1Yes() {
+            fireFireworks();
+            const step2 = document.getElementById('step2');
+            step2.style.display = 'block';
+            step2.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 2-Yo'q tugmasi bosilishi (Parchalanish)
+        function clickNo2() {
+            const btn = document.getElementById('noBtn2');
+            btn.classList.add('destroy');
+            setTimeout(() => { btn.style.display = 'none'; }, 500);
+        }
+
+        // 2-Savolga "Ha" javobi -> Maktub ochiladi
+        function answerStep2Yes() {
+            fireFireworks();
+            const letter = document.getElementById('secretLetter');
+            letter.style.display = 'block';
+            letter.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Musiqa
+        const audio = document.getElementById('bgMusic');
+        const mBtn = document.getElementById('mBtn');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                mBtn.innerHTML = '🎵';
+            } else {
+                audio.play();
+                mBtn.innerHTML = '🔊';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Rasmlar Slayderi (Faqat sizning 3 ta rasmingiz o'rin olgan)
+        const images = [
+            "rasm1.jpg",
+            "rasm2.jpg",
+            "rasm3.jpg"
+        ];
+        
+        let index = 0;
+        const imgElement = document.getElementById('slideImg');
+
+        setInterval(() => {
+            index = (index + 1) % images.length;
+            imgElement.style.opacity = 0;
+            setTimeout(() => {
+                imgElement.src = images[index];
+                imgElement.style.opacity = 1;
+            }, 400);
+        }, 3500);
+
+        // Uchuvchi yuraklar
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 90 + 'vw';
+            heart.style.animationDuration = Math.random() * 2 + 3 + 's';
+            document.body.appendChild(heart);
+
+            setTimeout(() => { heart.remove(); }, 4000);
+        }
+
+        setInterval(createHeart, 600);
+    </script>
+</body>
+</html>
